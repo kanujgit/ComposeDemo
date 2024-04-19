@@ -11,6 +11,9 @@
       <entry key="QuoteListScreen">
         <State />
       </entry>
+      <entry key="TextWithPaddingToBaselinePreview">
+        <State />
+      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>

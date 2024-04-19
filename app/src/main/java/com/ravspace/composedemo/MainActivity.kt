@@ -2,6 +2,8 @@ package com.ravspace.composedemo
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
+import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.animateColor
@@ -15,11 +17,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -29,9 +33,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,25 +46,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
-import com.ravspace.composedemo.ui.quote.DataManager
-import com.ravspace.composedemo.ui.quote.LaunchQuoteApp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.ravspace.composedemo.MainActivity.CustomLayoutsSnippet2.firstBaselineToTop
+import com.ravspace.composedemo.ui.tweetsty.TweetsAppDemo
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
@@ -120,12 +132,149 @@ class MainActivity : ComponentActivity() {
 
 
             //Quote App
-            CoroutineScope(Dispatchers.IO).launch {
-                DataManager.loadAssetFromFiles(this@MainActivity)
+//            CoroutineScope(Dispatchers.IO).launch {
+//                DataManager.loadAssetFromFiles(this@MainActivity)
+//            }
+
+            //  LaunchQuoteApp()
+
+            //launchEffect
+            //LaunchEffectDemo()
+            // disposableEffect
+            //DisposableEffectDemo()
+
+            //Derived state
+            //DerivedAndProduceStateDemo()
+
+            //TweetsAppDemo
+            TweetsAppDemo()
+
+            //weight demo
+            //  WeightDemo()
+            //custum layout
+            TextWithPaddingToBaselinePreview()
+            TextWithNormalPaddingPreview()
+        }
+    }
+
+    private object CustomLayoutsSnippet2 {
+        // [START android_compose_layouts_first_baseline]
+        fun Modifier.firstBaselineToTop(
+            firstBaselineToTop: Dp
+        ) = layout { measurable, constraints ->
+            // Measure the composable
+            val placeable = measurable.measure(constraints)
+
+            // Check the composable has a first baseline
+            check(placeable[FirstBaseline] != AlignmentLine.Unspecified)
+            val firstBaseline = placeable[FirstBaseline]
+
+            // Height of the composable with padding - first baseline
+            val placeableY = firstBaselineToTop.roundToPx() - firstBaseline
+            val height = placeable.height + placeableY
+            layout(placeable.width, height) {
+                // Where the composable gets placed
+                placeable.placeRelative(0, placeableY)
+            }
+        }
+    }
+
+    @Preview(showSystemUi = true, showBackground = true)
+    @Composable
+    private fun WeightDemo() {
+        Row(modifier = Modifier.width(100.dp)) {
+            Image(
+                modifier = Modifier.weight(4f),
+                painter = painterResource(id = R.drawable.anuj),
+                contentDescription = "Anuj"
+            )
+            Column(
+                modifier = Modifier.weight(2f)
+            ) {
+                Text(text = "Anuj Image")
             }
 
-            LaunchQuoteApp()
+        }
+    }
 
+    @Preview(showSystemUi = true, showBackground = true)
+    @Composable
+    fun TextWithPaddingToBaselinePreview() {
+
+        Text("Hi there!", Modifier.firstBaselineToTop(32.dp))
+    }
+
+    @Preview(showSystemUi = true, showBackground = true)
+    @Composable
+    fun TextWithNormalPaddingPreview() {
+        Text("Hi there!", Modifier.padding(top = 32.dp))
+    }
+
+    /*
+    * Derived state is used to calculate the value based on the other state
+    * Produce state is used to calculate the value based on the other state and it is used to perform the async operation
+    *
+     */
+    @SuppressLint("UnrememberedMutableState")
+    @Composable
+    private fun DerivedAndProduceStateDemo() {
+        val tableOf = remember {
+            mutableStateOf(2)
+        }
+//        val index = remember {
+//            mutableStateOf(1)
+//        }
+
+        val index = produceState(initialValue = 1) {
+            repeat(10) {
+                delay(1000L)
+                value += 1
+            }
+        }
+
+        val message =
+            derivedStateOf { "Table of ${tableOf.value} * $index = ${tableOf.value * index.value}" }
+
+        Column {
+            Text(text = message.value)
+            Button(onClick = {
+//                tableOf.value = 3
+//                index.value = 2
+            }) {
+                Text("Change Table")
+            }
+        }
+    }
+
+    /*
+    * DisposableEffect is used to add and remove listeners
+    * If keyboard is visible then it will print the log
+     */
+    @Composable
+    private fun DisposableEffectDemo() {
+        val view = LocalView.current
+        DisposableEffect(key1 = Unit) {
+            val listener = {
+                ViewTreeObserver.OnGlobalLayoutListener { ->
+                    val inset = ViewCompat.getRootWindowInsets(view)
+                    val isKeyboardVisisble = inset?.isVisible(WindowInsetsCompat.Type.ime())
+                    Log.d(TAG, "IME is visible $isKeyboardVisisble}")
+                }
+
+            }
+            view.viewTreeObserver.addOnGlobalLayoutListener { listener }
+            onDispose {
+                view.viewTreeObserver.removeOnDrawListener { listener }
+            }
+        }
+    }
+
+    @Composable
+    private fun LaunchEffectDemo() {
+        //bases on the key, if key is changed then only effect will be launched
+        LaunchedEffect(key1 = "Anuj") {
+            delay(1000L)
+            println("Launched Effect")
         }
     }
 
@@ -154,8 +303,7 @@ class MainActivity : ComponentActivity() {
             initialValue = Color.Red,
             targetValue = Color.Green,
             animationSpec = InfiniteRepeatableSpec(
-                tween(durationMillis = 5000),
-                repeatMode = RepeatMode.Restart
+                tween(durationMillis = 5000), repeatMode = RepeatMode.Restart
             ),
             label = "Nothing",
         )
@@ -253,12 +401,14 @@ class MainActivity : ComponentActivity() {
                     "Ravindra Singh Rajput Anuj Singh Rajput",
                     "Ravindra Singh Rajput Anuj Singh Rajput Anuj"
                 )
-            )
-            { index, name ->
+            ) { index, name ->
                 Text(
-                    text = name, modifier = Modifier
+                    text = name,
+                    modifier = Modifier
                         .padding(16.dp)
-                        .fillMaxWidth(), fontSize = 24.sp, textAlign = TextAlign.Center
+                        .fillMaxWidth(),
+                    fontSize = 24.sp,
+                    textAlign = TextAlign.Center
                 )
             }
 
