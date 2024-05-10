@@ -68,6 +68,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.ravspace.composedemo.MainActivity.CustomLayoutsSnippet2.firstBaselineToTop
+import com.ravspace.composedemo.ui.searchdemo.SearchScreen
 import com.ravspace.composedemo.ui.tweetsty.TweetsAppDemo
 import kotlinx.coroutines.delay
 import kotlin.random.Random
@@ -147,13 +148,16 @@ class MainActivity : ComponentActivity() {
             //DerivedAndProduceStateDemo()
 
             //TweetsAppDemo
-            TweetsAppDemo()
+            //TweetsAppDemo()
 
             //weight demo
             //  WeightDemo()
             //custum layout
-            TextWithPaddingToBaselinePreview()
-            TextWithNormalPaddingPreview()
+//            TextWithPaddingToBaselinePreview()
+//            TextWithNormalPaddingPreview()
+
+            SearchScreen()
+
         }
     }
 
