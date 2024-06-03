@@ -1,5 +1,6 @@
 package com.ravspace.composedemo.ui.searchdemo.di
 
+import com.ravspace.composedemo.ui.searchdemo.di.qualifier.SearchRetrofit
 import com.ravspace.composedemo.ui.searchdemo.service.ApiService
 import dagger.Module
 import dagger.Provides
@@ -11,10 +12,12 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class NetworkModule {
+class NetworkSearchModule {
 
     @Provides
     @Singleton
+    // @Named("search")
+    @SearchRetrofit
     fun provideRetrofitSearch(): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://api.jsonbin.io/")
@@ -24,7 +27,9 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideSearchApi(retrofit: Retrofit): ApiService {
-        return retrofit.create(ApiService::class.java)
+    @SearchRetrofit
+    //@Named("search")
+    fun provideSearchApi(retrofitApi: Retrofit): ApiService {
+        return retrofitApi.create(ApiService::class.java)
     }
 }
