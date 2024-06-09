@@ -70,9 +70,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.ravspace.composedemo.MainActivity.CustomLayoutsSnippet2.firstBaselineToTop
 import com.ravspace.composedemo.ui.searchdemo.SearchScreen
 import com.ravspace.composedemo.ui.tweetsty.TweetsAppDemo
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     companion object {
