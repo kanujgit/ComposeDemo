@@ -68,6 +68,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.ravspace.composedemo.MainActivity.CustomLayoutsSnippet2.firstBaselineToTop
+import com.ravspace.composedemo.ui.demoapp.DemoMainScreen
 import com.ravspace.composedemo.ui.searchdemo.SearchScreen
 import com.ravspace.composedemo.ui.tweetsty.TweetsAppDemo
 import dagger.hilt.android.AndroidEntryPoint
@@ -158,7 +159,9 @@ class MainActivity : ComponentActivity() {
 //            TextWithPaddingToBaselinePreview()
 //            TextWithNormalPaddingPreview()
 
-            SearchScreen()
+           // SearchScreen()
+
+            DemoMainScreen()
 
         }
     }
